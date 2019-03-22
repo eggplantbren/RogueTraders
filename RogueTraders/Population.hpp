@@ -78,9 +78,9 @@ void Population::compute_utility(int person)
     assert(person >= 0 && person < num_people);
     person_utilities[person] = 0.0;
 
-    // Person 1 has preferences with powers {0.5, 0.7}
+    // Person 1 has preferences with powers {0.5, 0.5}
     // and person 2 has {0.1, 0.8}.
-    std::vector<std::vector<double>> powers = { {0.5, 0.7}, {0.1, 0.8} };
+    std::vector<std::vector<double>> powers = { {0.5, 0.5}, {0.01, 0.8} };
 
     for(int i=0; i<num_goods; ++i)
         person_utilities[person] += pow(quantities[i][person],
