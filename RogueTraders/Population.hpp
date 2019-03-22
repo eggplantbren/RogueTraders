@@ -60,7 +60,7 @@ Population::Population(DNest4::RNG& rng)
         double tot = 0.0;
         for(int j=0; j<num_people; ++j)
         {
-            quantities[i][j] = -log(1.0 - rng.rand());
+            quantities[i][j] = 1.0;//-log(1.0 - rng.rand());
             tot += quantities[i][j];
         }
 
@@ -78,9 +78,10 @@ void Population::compute_utility(int person)
     assert(person >= 0 && person < num_people);
     person_utilities[person] = 0.0;
 
-    // Person 1 has preferences with powers {0.5, 0.5}
-    // and person 2 has {0.1, 0.8}.
-    std::vector<std::vector<double>> powers = { {0.5, 0.5}, {0.01, 0.8} };
+    // Powers for preferences. The first person is ambivalent, and the other
+    // two have opposite preferences.
+    std::vector<std::vector<double>> powers =
+                { {0.5, 0.5, 0.5}, {0.1, 0.4, 0.8}, {0.8, 0.3, 0.01} };
 
     for(int i=0; i<num_goods; ++i)
         person_utilities[person] += pow(quantities[i][person],
@@ -126,8 +127,8 @@ bool Population::try_trade(DNest4::RNG& rng)
     double quantity22 = quantities[good2][person2];
 
     // How much of each good is being given up?
-    double trade1 = quantity11*pow(rng.rand(), 10);
-    double trade2 = quantity22*pow(rng.rand(), 10);
+    double trade1 = quantity11*pow(rng.rand(), 10.0*rng.rand());
+    double trade2 = quantity22*pow(rng.rand(), 10.0*rng.rand());
 
     // Do the trade.
     // Loss
