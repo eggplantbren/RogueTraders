@@ -6,9 +6,10 @@
 namespace RogueTraders
 {
 
-constexpr int num_goods = 3;
-constexpr int num_people = 5;
-const std::vector<double> total_supplies = {10.0, 5.0, 3.0};
+// 2, 2, and {1.0, 1.0} will make it an Edgeworth box
+constexpr int num_goods = 2;
+constexpr int num_people = 2;
+const std::vector<double> total_supplies = {1.0, 1.0};
 
 } // namespace
 
