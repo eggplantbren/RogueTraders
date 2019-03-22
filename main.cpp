@@ -5,6 +5,7 @@ int main()
 {
     DNest4::RNG rng(time(0));
     RogueTraders::Population pop(rng);
+    std::cout << pop << std::endl;
 
     return 0;
 }

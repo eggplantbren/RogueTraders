@@ -1,7 +1,9 @@
 #ifndef RogueTraders_Population_hpp
 #define RogueTraders_Population_hpp
 
+#include <iomanip>
 #include "Options.hpp"
+#include <ostream>
 #include <DNest4/code/RNG.h>
 #include <vector>
 
@@ -20,7 +22,15 @@ class Population
 
         // Constructor. Specify the dimensions.
         Population(DNest4::RNG& rng);
+
+        // Getter
+        const std::vector<std::vector<double>>& get_quantities() const;
 };
+
+
+// Output operator
+std::ostream& operator << (std::ostream& out, const Population& pop);
+
 
 
 /* IMPLEMENTATIONS FOLLOW */
@@ -45,7 +55,26 @@ Population::Population(DNest4::RNG& rng)
     }
 }
 
+const std::vector<std::vector<double>>& Population::get_quantities() const
+{
+    return quantities;
+}
 
+
+std::ostream& operator << (std::ostream& out, const Population& pop)
+{
+    const auto& quantities = pop.get_quantities();
+
+    out << std::setprecision(8);
+    for(int i=0; i<num_goods; ++i)
+    {
+        for(int j=0; j<num_people; ++j)
+           out << std::setw(11) << quantities[i][j] << ' ';
+        out << '\n';
+    }
+
+    return out;
+}
 
 } // namespace
 
