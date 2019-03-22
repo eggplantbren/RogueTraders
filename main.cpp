@@ -1,33 +1,29 @@
 #include <iostream>
 #include "RogueTraders/Population.hpp"
 
+using namespace RogueTraders;
+
 int main()
 {
     DNest4::RNG rng(time(0));
-    RogueTraders::Population pop(rng);
     std::cout << std::setprecision(12);
 
-    std::cout << pop << std::endl;
+    constexpr int reps = 1000;
+    constexpr int steps = 100000;
 
-    for(int i=0; i<1000000; ++i)
+    for(int rep=0; rep<reps; ++rep)
     {
-        pop.try_trade(rng);
+        Population pop(rng);
 
-/*
+        for(int i=0; i<steps; ++i)
+            pop.try_trade(rng);
+
+        // Output assets of person 0
         const auto& qs = pop.get_quantities();
-        if(i%10000 == 0)
-        {
-            for(int a=0; a < 3; ++a)
-            {
-                for(int b=0; b < 3; ++b)
-                    std::cout << qs[a][b] << ' ';
-            }
-            std::cout << std::endl;
-        }
-*/
+        for(int good=0; good < num_goods; ++good)
+            std::cout << qs[good][0] << ' ';
+        std::cout << std::endl;
     }
-    std::cout << pop << std::endl;
-
 
     return 0;
 }

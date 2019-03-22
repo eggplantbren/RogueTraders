@@ -60,7 +60,7 @@ Population::Population(DNest4::RNG& rng)
         double tot = 0.0;
         for(int j=0; j<num_people; ++j)
         {
-            quantities[i][j] = 1.0;//-log(1.0 - rng.rand());
+            quantities[i][j] = -log(1.0 - rng.rand());
             tot += quantities[i][j];
         }
 
