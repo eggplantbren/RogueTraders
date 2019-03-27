@@ -7,6 +7,7 @@
 #include "Options.hpp"
 #include <ostream>
 #include <DNest4/code/RNG.h>
+#include <yaml-cpp/yaml.h>
 #include <vector>
 
 namespace RogueTraders
@@ -78,10 +79,31 @@ void Population::compute_utility(int person)
     assert(person >= 0 && person < num_people);
     person_utilities[person] = 0.0;
 
-    // Powers for preferences. The first person is ambivalent, and the other
-    // two have opposite preferences.
-    std::vector<std::vector<double>> powers =
-                { {0.5, 0.5, 0.5}, {0.1, 0.4, 0.8}, {0.8, 0.3, 0.01} };
+    // Powers for preferences. Load from YAML file preferences.yaml
+    static std::vector<std::vector<double>> powers;
+    if(powers.size() == 0)
+    {
+
+        YAML::Node yaml;
+        try
+        {
+            yaml = YAML::LoadFile("preferences.yaml");
+        }
+        catch(...)
+        {
+            std::cerr << "Error reading or parsing preferences.yaml.";
+            std::cerr << std::endl;
+        }
+
+        // Read preference parameters from the yaml node.
+        int num_people = yaml["people"].size();
+        for(int i=0; i<num_people; ++i)
+        {
+            const auto& person = yaml["people"][i];
+            powers.emplace_back(person["powers"].as<std::vector<double>>());
+        }
+    }
+
 
     for(int i=0; i<num_goods; ++i)
         person_utilities[person] += pow(quantities[i][person],

@@ -10,7 +10,7 @@ default:
 	$(CXX) $(ALL) -c RogueTraders/Options.hpp
 	$(CXX) $(ALL) -c RogueTraders/Population.hpp
 	$(CXX) $(ALL) -c main.cpp
-	$(CXX) $(LINK) -pthread -o main main.o -lpthread -ldnest4
+	$(CXX) $(LINK) -pthread -o main main.o -lpthread -ldnest4 -lyaml-cpp
 	rm -f main.o RogueTraders/*.gch
 
 
