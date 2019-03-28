@@ -4,10 +4,9 @@
 #include <cassert>
 #include <iomanip>
 #include <iostream>
-#include "Options.hpp"
+#include "Inputs.hpp"
 #include <ostream>
 #include <DNest4/code/RNG.h>
-#include <yaml-cpp/yaml.h>
 #include <vector>
 
 namespace RogueTraders
@@ -52,22 +51,23 @@ std::ostream& operator << (std::ostream& out, const Population& pop);
 /* IMPLEMENTATIONS FOLLOW */
 
 Population::Population(DNest4::RNG& rng)
-:quantities(num_goods, std::vector<double>(num_people))
-,person_utilities(num_people)
+:quantities(Inputs::instance.num_goods,
+            std::vector<double>(Inputs::instance.num_people))
+,person_utilities(Inputs::instance.num_people)
 {
-    for(int i=0; i<num_goods; ++i)
+    for(int i=0; i<Inputs::instance.num_goods; ++i)
     {
         // Generate from an exponential, accumulate total
         double tot = 0.0;
-        for(int j=0; j<num_people; ++j)
+        for(int j=0; j<Inputs::instance.num_people; ++j)
         {
             quantities[i][j] = -log(1.0 - rng.rand());
             tot += quantities[i][j];
         }
 
         // Factor for normalisation
-        double factor = total_supplies[i]/tot;
-        for(int j=0; j<num_people; ++j)
+        double factor = Inputs::instance.total_supplies[i]/tot;
+        for(int j=0; j<Inputs::instance.num_people; ++j)
             quantities[i][j] *= factor;
     }
 
@@ -76,43 +76,17 @@ Population::Population(DNest4::RNG& rng)
 
 void Population::compute_utility(int person)
 {
-    assert(person >= 0 && person < num_people);
+    assert(person >= 0 && person < Inputs::instance.num_people);
     person_utilities[person] = 0.0;
 
-    // Powers for preferences. Load from YAML file preferences.yaml
-    static std::vector<std::vector<double>> powers;
-    if(powers.size() == 0)
-    {
-
-        YAML::Node yaml;
-        try
-        {
-            yaml = YAML::LoadFile("preferences.yaml");
-        }
-        catch(...)
-        {
-            std::cerr << "Error reading or parsing preferences.yaml.";
-            std::cerr << std::endl;
-        }
-
-        // Read preference parameters from the yaml node.
-        int num_people = yaml["people"].size();
-        for(int i=0; i<num_people; ++i)
-        {
-            const auto& person = yaml["people"][i];
-            powers.emplace_back(person["powers"].as<std::vector<double>>());
-        }
-    }
-
-
-    for(int i=0; i<num_goods; ++i)
+    for(int i=0; i<Inputs::instance.num_goods; ++i)
         person_utilities[person] += pow(quantities[i][person],
-                                        powers[person][i]);
+                                        Inputs::instance.powers[person][i]);
 }
 
 void Population::compute_utilities()
 {
-    for(int i=0; i<num_people; ++i)
+    for(int i=0; i<Inputs::instance.num_people; ++i)
         compute_utility(i);
 }
 
@@ -129,16 +103,16 @@ const std::vector<double>& Population::get_person_utilities() const
 bool Population::try_trade(DNest4::RNG& rng)
 {
     // Choose two people to trade between
-    int person1 = rng.rand_int(num_people);
+    int person1 = rng.rand_int(Inputs::instance.num_people);
     int person2;
     do
     {
-        person2 = rng.rand_int(num_people);
+        person2 = rng.rand_int(Inputs::instance.num_people);
     }while(person2 == person1);
 
     // Which goods are they trading?
-    int good1 = rng.rand_int(num_goods);
-    int good2 = rng.rand_int(num_goods);
+    int good1 = rng.rand_int(Inputs::instance.num_goods);
+    int good2 = rng.rand_int(Inputs::instance.num_goods);
 
     // Backup utilities and quantities
     double utility1 = person_utilities[person1];
@@ -198,11 +172,11 @@ std::ostream& operator << (std::ostream& out, const Population& pop)
     out << std::setprecision(12);
 
     out << "quantities:\n";
-    for(int i=0; i<num_goods; ++i)
-        for(int j=0; j<num_people; ++j)
+    for(int i=0; i<Inputs::instance.num_goods; ++i)
+        for(int j=0; j<Inputs::instance.num_people; ++j)
             out << "    - " << quantities[i][j] << '\n';
     out << "utilities:\n";
-    for(int j=0; j<num_people; ++j)
+    for(int j=0; j<Inputs::instance.num_people; ++j)
         out << "    - " << person_utilities[j] << '\n';
 
     return out;

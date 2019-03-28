@@ -20,7 +20,7 @@ int main()
 
         // Output assets of person 0
         const auto& qs = pop.get_quantities();
-        for(int good=0; good < num_goods; ++good)
+        for(int good=0; good < Inputs::instance.num_goods; ++good)
             std::cout << qs[good][0] << ' ';
         std::cout << std::endl;
     }
